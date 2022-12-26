@@ -13,7 +13,7 @@ export default {
   data: function() {
     return {
       memos: ref(useLocalStorage('memos',[])),
-      memoText: ref(this.memoContent),
+      memoText: this.memoContent,
     }
   },
   methods:{
@@ -56,10 +56,12 @@ export default {
   </div>
   <div v-else>
   <p>newちゃうで</p>
-  <textarea v-model="memoText" ></textarea>
+  <textarea v-model="memoText"></textarea>
   <button @click='editMemo'>保存</button>
   <button @click='deleteMemo'>削除</button>
   {{memoId}}
+{{memoContent}}
+{{memoText}}
 </div>
 
 </template>
