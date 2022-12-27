@@ -7,7 +7,6 @@ export default {
   data: function() {
     return {
       memos: ref(useLocalStorage('memos',[])),
-      memoContent:ref('')
     }
   },
 }
@@ -24,7 +23,7 @@ export default {
     </li>
   </ul>
   <p v-else>メモはありません</p>
-  <RouterLink to="/memos/new">＋</RouterLink>
-  <RouterView :memoContent="memoContent" />
+  <router-link to="/memos/new">＋</router-link>
+  <router-view />
 
 </template>
