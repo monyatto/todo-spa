@@ -1,75 +1,105 @@
 <script>
-import { useLocalStorage } from '@vueuse/core';
-import { ref } from 'vue';
+import { useLocalStorage } from "@vueuse/core";
+import { ref } from "vue";
 
 export default {
   props: {
     isNew: Boolean,
     memoId: String,
   },
-  data: function() {
+  data: function () {
     return {
-      memos: ref(useLocalStorage('memos',[])),
-      memoText: ref('')
-    }
+      memos: ref(useLocalStorage("memos", [])),
+      memoContent: ref(""),
+    };
   },
-  methods:{
-    addMemo:function(){
+  methods: {
+    addMemo: function () {
       const uid = self.crypto.randomUUID();
-      const content = this.memoText;
-      const title = content.split(/\n/)[0]
-      const memo = { id: uid ,title: title, content: content };
+      const content = this.memoContent;
+      const title = content.split(/\n/)[0];
+      const memo = { id: uid, title: title, content: content };
       this.memos.push(memo);
-      this.memoText = ''
+      this.memoContent = "";
     },
     editMemo() {
       this.memos.forEach((memo, i) => {
-        if (memo.id === this.memoId){
+        if (memo.id === this.memoId) {
           const newMemo = {
             ...memo,
-            title: this.memoText.split(/\n/)[0],
-            content: this.memoText,
-          }
-          this.memos.splice(i, 1, newMemo)
-          this.memoText = ''
+            title: this.memoContent.split(/\n/)[0],
+            content: this.memoContent,
+          };
+          this.memos.splice(i, 1, newMemo);
         }
       });
     },
     deleteMemo() {
-      const index = (this.memos.indexOf(this.memos.find((memo) => memo.id === this.memoId)))
-      this.memos.splice(index, 1)
-      this.memoText = ''
+      const index = this.memos.indexOf(
+        this.memos.find((memo) => memo.id === this.memoId)
+      );
+      this.memos.splice(index, 1);
+      this.memoContent = "";
     },
     findMemo() {
-      return this.memos.find((memo) => memo.id === this.memoId)
+      return this.memos.find((memo) => memo.id === this.memoId);
     },
   },
   created() {
-    if(!this.isNew) {
-      this.memoText = this.findMemo().content
+    if (this.isNew) {
+      this.memoContent = "";
+    } else {
+      this.memoContent = this.findMemo().content;
     }
   },
   watch: {
     memoId() {
-      if(!this.isNew) {
-        this.memoText = this.findMemo().content
-      }else{
-        this.memoText = ''
+      if (this.isNew) {
+        this.memoContent = "";
+      } else {
+        this.memoContent = this.findMemo().content;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <template>
-  <div v-if="isNew">
-    <textarea v-model="memoText" placeholder="メモを入力してください"></textarea>
-    <button @click="addMemo()">保存</button>
+  <div class="flex flex-col">
+    <div v-if="isNew">
+      <div>
+        <textarea
+          class="textarea textarea-bordered w-full rounded-md"
+          rows="18"
+          v-model="memoContent"
+          placeholder="メモを入力してください"
+        ></textarea>
+      </div>
+      <div class="flex justify-center mx-8">
+        <button @click="addMemo()" class="btn btn-wide btn-outline btn-primary">
+          保存
+        </button>
+      </div>
+    </div>
+    <div v-else>
+      <div>
+        <textarea
+          class="textarea textarea-bordered w-full rounded-md"
+          rows="18"
+          v-model="memoContent"
+        ></textarea>
+      </div>
+      <div class="flex justify-center">
+        <button
+          @click="editMemo"
+          class="btn btn-wide btn-outline btn-primary mx-1"
+        >
+          保存
+        </button>
+        <button @click="deleteMemo" class="btn btn-outline btn-secondary mx-1">
+          削除
+        </button>
+      </div>
+    </div>
   </div>
-  <div v-else>
-    <textarea v-model="memoText"></textarea>
-    <button @click='editMemo'>保存</button>
-    <button @click='deleteMemo'>削除</button>
-  </div>
-
 </template>

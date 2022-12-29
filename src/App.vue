@@ -1,29 +1,29 @@
 <script>
-import { RouterLink, RouterView } from 'vue-router'
-import { useLocalStorage } from '@vueuse/core';
-import { ref } from 'vue';
+import { useLocalStorage } from "@vueuse/core";
+import { ref } from "vue";
 
 export default {
-  data: function() {
+  data: function () {
     return {
-      memos: ref(useLocalStorage('memos',[])),
-    }
+      memos: ref(useLocalStorage("memos", [])),
+    };
   },
-}
-
+};
 </script>
 
 <template>
-  <h1>メモアプリ</h1>
-
-  <h2>メモ一覧</h2>
-  <ul v-if="this.memos.length">
-    <li v-for="memo in this.memos" v-bind:key="memo.id">
-      <router-link :to="`/memos/${memo.id}`" v-on:click="memoContent=memo.content">{{ memo.title }}</router-link>
-    </li>
-  </ul>
-  <p v-else>メモはありません</p>
-  <router-link to="/memos/new">＋</router-link>
-  <router-view />
-
+  <div class="flex mb-4">
+    <div class="w-1/4 h-12 mx-8 my-8">
+      <ul v-if="this.memos.length">
+        <li v-for="memo in this.memos" v-bind:key="memo.id" class="my-1">
+          <router-link :to="`/memos/${memo.id}`">{{ memo.title }}</router-link>
+        </li>
+      </ul>
+      <p v-else>メモはありません</p>
+      <router-link class="link link-primary" to="/memos/new">＋</router-link>
+    </div>
+    <div class="w-3/4 h-12 mx-8 my-8">
+      <router-view />
+    </div>
+  </div>
 </template>
