@@ -11,7 +11,7 @@ const router = createRouter({
       path: "/memos/new",
       name: "new",
       component: () => import("../views/FormView.vue"),
-      props: { isNew: true },
+      props: true,
     },
     {
       path: "/memos/:memoId",

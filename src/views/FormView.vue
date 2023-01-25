@@ -1,16 +1,14 @@
 <script>
 import { useLocalStorage } from "@vueuse/core";
-import { ref } from "vue";
 
 export default {
   props: {
-    isNew: Boolean,
     memoId: String,
   },
   data: function () {
     return {
-      memos: ref(useLocalStorage("memos", [])),
-      memoContent: ref(""),
+      memos: useLocalStorage("memos", []),
+      memoContent: "",
     };
   },
   methods: {
@@ -18,7 +16,7 @@ export default {
       const uid = self.crypto.randomUUID();
       const content = this.memoContent;
       const title = content.split(/\n/)[0];
-      const memo = { id: uid, title: title, content: content };
+      const memo = { id: uid, title, content };
       this.memos.push(memo);
       this.memoContent = "";
     },
@@ -41,47 +39,29 @@ export default {
       this.memos.splice(index, 1);
       this.memoContent = "";
     },
-    findMemo() {
-      return this.memos.find((memo) => memo.id === this.memoId);
+    findMemo(id) {
+      return this.memos.find((memo) => memo.id === id);
     },
   },
   created() {
-    if (this.isNew) {
-      this.memoContent = "";
-    } else {
-      this.memoContent = this.findMemo().content;
-    }
+    this.memoContent = this.memoId ? this.findMemo(this.memoId).content : "";
   },
-  watch: {
-    memoId() {
-      if (this.isNew) {
-        this.memoContent = "";
-      } else {
-        this.memoContent = this.findMemo().content;
-      }
-    },
+  beforeRouteUpdate(to, from, next) {
+    this.memoContent = this.findMemo(to.params.memoId).content;
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.memoContent = to.params.memoId
+      ? this.findMemo(to.params.memoId).content
+      : "";
+    next();
   },
 };
 </script>
 
 <template>
   <div class="flex flex-col">
-    <div v-if="isNew">
-      <div>
-        <textarea
-          class="textarea textarea-bordered w-full rounded-md"
-          rows="18"
-          v-model="memoContent"
-          placeholder="メモを入力してください"
-        ></textarea>
-      </div>
-      <div class="flex justify-center mx-8">
-        <button @click="addMemo()" class="btn btn-wide btn-outline btn-primary">
-          保存
-        </button>
-      </div>
-    </div>
-    <div v-else>
+    <div v-if="memoId">
       <div>
         <textarea
           class="textarea textarea-bordered w-full rounded-md"
@@ -98,6 +78,21 @@ export default {
         </button>
         <button @click="deleteMemo" class="btn btn-outline btn-secondary mx-1">
           削除
+        </button>
+      </div>
+    </div>
+    <div v-else>
+      <div>
+        <textarea
+          class="textarea textarea-bordered w-full rounded-md"
+          rows="18"
+          v-model="memoContent"
+          placeholder="メモを入力してください"
+        ></textarea>
+      </div>
+      <div class="flex justify-center mx-8">
+        <button @click="addMemo()" class="btn btn-wide btn-outline btn-primary">
+          保存
         </button>
       </div>
     </div>
